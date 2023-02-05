@@ -9,6 +9,7 @@ public interface WindowManager {
     void pollEvents();
 
     void setTitle(String title);
+    void setCursorPosition(int x, int y);
 
     int getWindowX();
     int getWindowY();

@@ -73,7 +73,7 @@ dependencies {
 		transitive false
 	}
 
-	modImplementation("com.github.jaquobia:frankinglfw:${project.frankinglfw_version}")
+	modImplementation include("com.github.jaquobia:frankinglfw:${project.frankinglfw_version}")
 }
 
 processResources {

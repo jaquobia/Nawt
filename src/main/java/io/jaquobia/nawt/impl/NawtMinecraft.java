@@ -3,6 +3,8 @@ package io.jaquobia.nawt.impl;
 import io.jaquobia.nawt.Nawt;
 import io.jaquobia.nawt.api.WindowManager;
 import io.jaquobia.nawt.impl.glfw.IntegratedGlfwWM;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.GameStartupError;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.Session;
@@ -17,6 +19,7 @@ import java.util.function.Supplier;
 
 // "modmenu": [ "io.jaquobia.nawt.integration.NawtModMenuImpl" ],
 
+@Environment(EnvType.CLIENT)
 public class NawtMinecraft extends Minecraft {
 
     private static NawtMinecraft INSTANCE;
@@ -348,4 +351,15 @@ public class NawtMinecraft extends Minecraft {
         Display.update();
     }
 
+    public static int Width() {
+        return INSTANCE.actualWidth;
+    }
+
+    public static int Height() {
+        return INSTANCE.actualHeight;
+    }
+
+    public static void SetCursorPosition(int x, int y) {
+        INSTANCE.wm.setCursorPosition(x, y);
+    }
 }

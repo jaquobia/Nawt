@@ -1,8 +1,11 @@
 package io.jaquobia.nawt.impl.glfw;
 
 import io.github.jaquobia.Glfw;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.lwjgl.input.Keyboard;
 
+@Environment(EnvType.CLIENT)
 public class LwjglToGlfwHelper {
     public static int translateKeyToGlfw(int key) {
         return LwjglToGlfw[key];

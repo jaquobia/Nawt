@@ -8,13 +8,14 @@
   "server": [
   ],
   "client": [
+    "MixinClass_596",
+    "MixinController",
     "MixinCursor",
     "MixinDisplay",
     "MixinKeyboard",
     "MixinMinecraft",
     "MixinMinecraftApplet",
-    "MixinMouse",
-    "MixinController"
+    "MixinMouse"
   ],
   "injectors": {
     "defaultRequire": 1

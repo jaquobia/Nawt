@@ -5,11 +5,14 @@ import io.github.jaquobia.GlfwCallback;
 import io.jaquobia.nawt.Nawt;
 import io.jaquobia.nawt.api.WindowManager;
 import io.jaquobia.nawt.impl.NawtMinecraft;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.lwjgl.input.Keyboard;
 
 import static io.jaquobia.nawt.impl.glfw.LwjglToGlfwHelper.translateKeyToGlfw;
 import static io.jaquobia.nawt.impl.glfw.LwjglToGlfwHelper.translateKeyToLWJGL;
 
+@Environment(EnvType.CLIENT)
 public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
 
     static boolean glfwInit = Glfw.glfwInit(); // A nice way to initialize glfw and report it at the same time
@@ -90,6 +93,11 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
     @Override
     public void setTitle(String title) {
         Glfw.glfwSetWindowTitle(window, title);
+    }
+
+    @Override
+    public void setCursorPosition(int x, int y) {
+        Glfw.glfwSetCursorPos(window, x, y);
     }
 
     @Override
@@ -242,8 +250,8 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
 
         // Key is non-shift-modifiable
         currentKeyboardButtonCharacter = currentKeyboardButton == Glfw.GLFW_KEY_SPACE ? ' ' : '\0';
-
-        NawtMinecraft.PushKeyboardEvent(translateKeyToLWJGL(currentMouseButton), currentKeyboardButtonState, currentKeyboardButtonModifiers, currentKeyboardButtonCharacter);
+        Nawt.LOGGER.info("B");
+        NawtMinecraft.PushKeyboardEvent(translateKeyToLWJGL(currentKeyboardButton), currentKeyboardButtonState, currentKeyboardButtonModifiers, currentKeyboardButtonCharacter);
     }
 
     public String getKeyName() {
@@ -258,6 +266,7 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
                 currentKeyboardButtonCharacter = 22;
             } else
                 currentKeyboardButtonCharacter = (char) codepoint;
+            Nawt.LOGGER.info("A");
             NawtMinecraft.PushKeyboardEvent(translateKeyToLWJGL(currentKeyboardButton), currentKeyboardButtonState, currentKeyboardButtonModifiers, currentKeyboardButtonCharacter);
         }
 

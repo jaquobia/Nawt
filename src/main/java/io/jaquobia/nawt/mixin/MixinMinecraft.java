@@ -7,6 +7,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.awt.*;
+
 /**
  * Inject creation and termination of the WM into the head and tail Minecraft.run() function - compats with stapi
  */
@@ -21,4 +23,5 @@ public class MixinMinecraft {
     private void injectTailInit(CallbackInfo ci) {
         NawtMinecraft.DestroyWM();
     }
+
 }

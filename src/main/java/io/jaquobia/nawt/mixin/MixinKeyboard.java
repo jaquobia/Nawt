@@ -1,6 +1,5 @@
 package io.jaquobia.nawt.mixin;
 
-import io.jaquobia.nawt.Nawt;
 import io.jaquobia.nawt.impl.NawtMinecraft;
 import org.lwjgl.input.Keyboard;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,8 +17,6 @@ public class MixinKeyboard {
     @Inject(method = "next", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectNext(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(NawtMinecraft.NextKeyboard());
-        if (NawtMinecraft.GetEventKeyboardButton() != 0)
-        Nawt.LOGGER.info("" + NawtMinecraft.GetEventKeyboardButton() + " " + NawtMinecraft.GetEventKeyboardButtonChar() + " " + NawtMinecraft.GetEventKeyboardButtonState());
     }
     @Inject(method = "getNumKeyboardEvents", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetNumKeyboardEvents(CallbackInfoReturnable<Integer> cir) {

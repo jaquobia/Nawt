@@ -106,4 +106,12 @@ public class MixinMouse {
     private static void injectSetGrabbed(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(NawtMinecraft.GetMouseGrabbed());
     }
+
+    @Inject(method = "setCursorPosition", at = @At("HEAD"), remap = false, cancellable = true)
+    private static void injectSetCursorPosition(int new_x, int new_y, CallbackInfo ci) {
+        NawtMinecraft.SetCursorPosition(new_x, new_y);
+        ci.cancel();
+    }
+
+
 }
