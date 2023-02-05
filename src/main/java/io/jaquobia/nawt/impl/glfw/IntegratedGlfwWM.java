@@ -230,12 +230,12 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
     @Override
     public void key(long window, int key, int scancode, int action, int mods) {
         // Set up dummy lwjgl states
-        currentKeyboardButtonState = action >= Glfw.GLFW_PRESS;
         currentKeyboardButton = key;
+        currentKeyboardButtonState = action >= Glfw.GLFW_PRESS;
         currentKeyboardButtonModifiers = mods;
 
         // Delegate if shift-modifiable
-        delegateToCharCallback = action != Glfw.GLFW_RELEASE && key >= Glfw.GLFW_KEY_APOSTROPHE && key <= Glfw.GLFW_KEY_GRAVE_ACCENT;
+        delegateToCharCallback = currentKeyboardButtonState && key >= Glfw.GLFW_KEY_APOSTROPHE && key <= Glfw.GLFW_KEY_GRAVE_ACCENT;
         if (delegateToCharCallback) {
             return;
         }
@@ -258,8 +258,9 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
                 currentKeyboardButtonCharacter = 22;
             } else
                 currentKeyboardButtonCharacter = (char) codepoint;
+            NawtMinecraft.PushKeyboardEvent(translateKeyToLWJGL(currentKeyboardButton), currentKeyboardButtonState, currentKeyboardButtonModifiers, currentKeyboardButtonCharacter);
         }
-        NawtMinecraft.PushKeyboardEvent(translateKeyToLWJGL(currentMouseButton), currentKeyboardButtonState, currentKeyboardButtonModifiers, currentKeyboardButtonCharacter);
+
     }
 
     @Override
@@ -299,7 +300,7 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
         this.mouseDX += this.mouseX - this.mouseLX;
         this.mouseDY += this.mouseY - this.mouseLY;
 
-        NawtMinecraft.PushMousePositionEvent(this.mouseX, this.mouseY);
+        NawtMinecraft.PushMousePositionEvent(this.mouseX, this.mouseY, this.mouseDX, this.mouseDY);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package io.jaquobia.nawt.mixin;
 
+import io.jaquobia.nawt.Nawt;
 import io.jaquobia.nawt.impl.NawtMinecraft;
 import org.lwjgl.input.Keyboard;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,6 +18,8 @@ public class MixinKeyboard {
     @Inject(method = "next", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectNext(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(NawtMinecraft.NextKeyboard());
+        if (NawtMinecraft.GetEventKeyboardButton() != 0)
+        Nawt.LOGGER.info("" + NawtMinecraft.GetEventKeyboardButton() + " " + NawtMinecraft.GetEventKeyboardButtonChar() + " " + NawtMinecraft.GetEventKeyboardButtonState());
     }
     @Inject(method = "getNumKeyboardEvents", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetNumKeyboardEvents(CallbackInfoReturnable<Integer> cir) {
@@ -24,15 +27,15 @@ public class MixinKeyboard {
     }
     @Inject(method = "getEventKey", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetEventKey(CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(NawtMinecraft.GetCurrentKeyboardButton());
+        cir.setReturnValue(NawtMinecraft.GetEventKeyboardButton());
     }
     @Inject(method = "getEventCharacter", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetCharacter(CallbackInfoReturnable<Character> cir) {
-        cir.setReturnValue(NawtMinecraft.GetCurrentKeyboardButtonChar());
+        cir.setReturnValue(NawtMinecraft.GetEventKeyboardButtonChar());
     }
     @Inject(method = "getEventKeyState", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetEventKeyState(CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(NawtMinecraft.GetCurrentKeyboardButtonState());
+        cir.setReturnValue(NawtMinecraft.GetEventKeyboardButtonState());
     }
 
     @Inject(method = "create()V", at = @At("HEAD"), remap = false, cancellable = true)

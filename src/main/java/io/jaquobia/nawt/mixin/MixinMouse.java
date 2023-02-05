@@ -48,13 +48,11 @@ public class MixinMouse {
 
     @Inject(method = "getEventButtonState", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetEventButtonState(CallbackInfoReturnable<Boolean> cir) {
-        Nawt.LOGGER.info("getting event mouse button state: " + NawtMinecraft.GetEventMouseButtonState());
         cir.setReturnValue(NawtMinecraft.GetEventMouseButtonState());
     }
 
     @Inject(method = "getEventButton", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetEventButton(CallbackInfoReturnable<Integer> cir) {
-        Nawt.LOGGER.info("getting event button: " + NawtMinecraft.GetEventMouseButton());
         cir.setReturnValue(NawtMinecraft.GetEventMouseButton());
     }
     @Inject(method = "isCreated", at = @At("HEAD"), remap = false, cancellable = true)
@@ -81,7 +79,7 @@ public class MixinMouse {
 
     @Inject(method = "getEventDWheel", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetEventDWheel(CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(NawtMinecraft.GetMouseScroll());
+        cir.setReturnValue(NawtMinecraft.GetEventMouseScroll());
     }
     @Inject(method = "getDWheel", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetDWheel(CallbackInfoReturnable<Integer> cir) {

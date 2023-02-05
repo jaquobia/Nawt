@@ -26,11 +26,9 @@ public class NawtMinecraft extends Minecraft {
 
     List<MouseEvent> mouseEvents;
     List<KeyboardEvent> keyboardEvents;
-    List<ScrollEvent> scrollEvents;
 
-    record MouseEvent(int button, boolean state, int x, int y, int dx, int dy) {}
+    record MouseEvent(int button, boolean state, int x, int y, int dx, int dy, int delta) {}
     record KeyboardEvent(int button, boolean state, int modifiers, char character) {}
-    record ScrollEvent(int delta) {}
 
     /// General Usage Variables
     Thread mcThread;
@@ -44,7 +42,6 @@ public class NawtMinecraft extends Minecraft {
     private int mouseDX = 0, mouseDY = 0;
 
     /// Current Keyboard Event
-//    private KeyboardEvent currentKeyboardEvent;
     private int currentKeyboardButton = 0;
     private boolean currentKeyboardButtonState = false;
     private int currentKeyboardButtonModifiers = 0;
@@ -64,7 +61,6 @@ public class NawtMinecraft extends Minecraft {
 
         keyboardEvents = new ArrayList<>();
         mouseEvents = new ArrayList<>();
-        scrollEvents = new ArrayList<>();
     }
 
     public static void runWindow(int width, int height, boolean fullscreen, String username, String host, String port) {
@@ -160,10 +156,21 @@ public class NawtMinecraft extends Minecraft {
             MouseEvent event = INSTANCE.mouseEvents.remove(0);
             INSTANCE.currentMouseButton = event.button;
             INSTANCE.currentMouseButtonState = event.state;
+            INSTANCE.mouseX = event.x;
+            INSTANCE.mouseY = event.y;
+            INSTANCE.mouseDX = event.dx;
+            INSTANCE.mouseDY = event.dy;
+            INSTANCE.currentScrollDelta = event.delta;
             return true;
         }
         INSTANCE.currentMouseButton = -1;
-        INSTANCE.currentMouseButtonState = true;
+        INSTANCE.currentMouseButtonState = false;
+        INSTANCE.mouseX = 0;
+        INSTANCE.mouseY = 0;
+        INSTANCE.mouseDX = 0;
+        INSTANCE.mouseDY = 0;
+        INSTANCE.currentScrollDelta = 0;
+
         return false;
     }
 
@@ -171,34 +178,19 @@ public class NawtMinecraft extends Minecraft {
         return INSTANCE.mouseEvents.size();
     }
 
-    public static boolean NextEventScroll() {
-        if (INSTANCE.scrollEvents.size() > 0) {
-            ScrollEvent event = INSTANCE.scrollEvents.remove(0);
-            INSTANCE.currentScrollDelta = event.delta;
-            return true;
-        }
-        INSTANCE.currentScrollDelta = 0;
-        return false;
-    }
-
-    public static int NumberEventsScroll() {
-        return INSTANCE.scrollEvents.size();
-    }
-
-    public static void PushMouseDeltaEvent(int mouseDX, int mouseDY) {
-        INSTANCE.mouseEvents.add(new MouseEvent(-1, false, 0, 0, mouseDX, mouseDY));
-    }
-    public static void PushMousePositionEvent(int mouseX, int mouseY) {
-        INSTANCE.mouseEvents.add(new MouseEvent(-1, false, mouseX, mouseY, 0, 0));
+    public static void PushMousePositionEvent(int mouseX, int mouseY, int mouseDX, int mouseDY) {
+        INSTANCE.mouseEvents.add(new MouseEvent(-1, false, mouseX, mouseY, mouseDX, mouseDY, 0));
     }
     public static void PushMouseButtonEvent(int button, boolean buttonState) {
-        INSTANCE.mouseEvents.add(new MouseEvent(button, buttonState, 0, 0, 0, 0));
+        INSTANCE.mouseEvents.add(new MouseEvent(button, buttonState, GetMouseX(), GetMouseY(), GetMouseDX(), GetMouseDY(), 0));
     }
     public static void PushKeyboardEvent(int key, boolean state, int modifiers, char character) {
+        Nawt.LOGGER.info("T: " + key + " ?" + character + " " + state);
         INSTANCE.keyboardEvents.add(new KeyboardEvent(key, state, modifiers, character));
     }
     public static void PushScrollEvent(int delta) {
-        INSTANCE.scrollEvents.add(new ScrollEvent(delta));
+//        INSTANCE.scrollEvents.add(new ScrollEvent(delta));
+        INSTANCE.mouseEvents.add(new MouseEvent(-1, false, 0, 0, 0, 0, delta));
     }
 
     public static int GetEventMouseX() {
@@ -213,6 +205,16 @@ public class NawtMinecraft extends Minecraft {
     public static int GetEventMouseDY() {
         return INSTANCE.mouseDY;
     }
+    public static int GetEventMouseScroll() {
+        return INSTANCE.currentScrollDelta;
+    }
+    public static int GetEventMouseButton() {
+        return INSTANCE.currentMouseButton;
+    }
+    public static boolean GetEventMouseButtonState() {
+        return INSTANCE.currentMouseButtonState;
+    }
+
 
     public static int GetMouseX() {
         return INSTANCE.wm.getMouseX();
@@ -226,42 +228,31 @@ public class NawtMinecraft extends Minecraft {
     public static int GetMouseDY() {
         return INSTANCE.wm.getMouseDY();
     }
-
+    public static int GetMouseScroll() {
+        return INSTANCE.wm.getMouseScroll();
+    }
     public static boolean GetMouseButtonDown(int button) {
         return INSTANCE.wm.isMouseButtonDown(button);
     }
 
-    public static int GetEventMouseButton() {
-        return INSTANCE.currentMouseButton;
-    }
-    public static boolean GetEventMouseButtonState() {
-        return INSTANCE.currentMouseButtonState;
-    }
-
-
     public static void SetMouseGrabbed(boolean grab) {
         INSTANCE.wm.setMouseGrab(grab);
     }
-
     public static boolean GetMouseGrabbed() {
         return INSTANCE.wm.isMouseGrabbed();
     }
 
-    public static int GetMouseScroll() {
-        return INSTANCE.wm.getMouseScroll();
-    }
-
-    public static int GetCurrentKeyboardButton() {
+    public static int GetEventKeyboardButton() {
         return INSTANCE.currentKeyboardButton;
     }
-    public static boolean GetCurrentKeyboardButtonState() {
+    public static boolean GetEventKeyboardButtonState() {
         return INSTANCE.currentKeyboardButtonState;
     }
     public static int GetCurrentKeyboardButtonModifiers() {
         return INSTANCE.currentKeyboardButtonModifiers;
     }
 
-    public static char GetCurrentKeyboardButtonChar() {
+    public static char GetEventKeyboardButtonChar() {
         return INSTANCE.currentKeyboardButtonCharacter;
     }
 
@@ -291,7 +282,6 @@ public class NawtMinecraft extends Minecraft {
             throw new RuntimeException(e);
         }
 
-//        GL11.glViewport(0, 0, width, height);
         Nawt.LOGGER.info("Created OpenGL 3.3 context!");
     }
 
