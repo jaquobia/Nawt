@@ -1,17 +1,18 @@
-# Fabric Example Mod with StationAPI and BIN Mappings for beta 1.7.3 server + client
+## Nawt
 
-## Setup
+A mod made to replace the applet rendering with a framework for any windowing library, with built-in glfw as a default
 
-[See the StationAPI wiki.](https://github.com/ModificationStation/StationAPI/wiki)
+This mod should work with almost any beta fabric mod since it touches mostly LWJGL classes and a 2 or 3 tiny redirects in Minecraft sources; however its build with STAPI in mind
 
-## Common Issues
+## Warning
 
-**I get "Invalid source release: 17" as an error!**  
-Use Java 17. Open up `File > Project Structure` and change your SDK to Java 17.  
-If you still get the issue, you may need to go into `File > Settings > Build, Execution, Deployment > Build Tools > Gradle` and change the Java that Gradle uses too.
+This mod is definitely highly-experimental, so it's a use-at-your-own-risk kind of thing  
+Feel free to make issues or pull requests
 
-[Here for more issues.](https://github.com/calmilamsy/BIN-fabric-example-mod#common-issues)
+## Future
+
+I might look into entrypoints for loading new windowing systems, and I could possibly make some bindings for glfw on the path or sdl2
 
 ## License
 
-This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
+MIT, glhf
