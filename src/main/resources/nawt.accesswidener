@@ -1,0 +1,18 @@
+accessWidener v1 named
+
+accessible field net/minecraft/client/Minecraft tickTimer Lnet/minecraft/client/Timer;
+accessible field net/minecraft/client/Minecraft resourceDownloadThread Lnet/minecraft/client/util/ThreadDownloadResources;
+accessible field net/minecraft/client/Minecraft gameDir Ljava/io/File;
+accessible field net/minecraft/client/Minecraft ticksPlayed I
+accessible field net/minecraft/client/Minecraft width I
+accessible field net/minecraft/client/Minecraft height I
+accessible field net/minecraft/client/Minecraft lastTickTime J
+accessible field net/minecraft/client/Minecraft isFullscreen Z
+accessible method net/minecraft/client/Minecraft forceResourceReload ()V
+accessible method net/minecraft/client/Minecraft method_2110 (IZ)V
+accessible method net/minecraft/client/Minecraft method_2103 ()V
+accessible method net/minecraft/client/Minecraft method_2107 (I)V
+accessible method net/minecraft/client/Minecraft method_2111 (J)V
+accessible method net/minecraft/client/Minecraft method_2150 ()V
+accessible method net/minecraft/client/Minecraft updateScreenResolution (II)V
+accessible field net/minecraft/client/Minecraft serverIp Ljava/lang/String;

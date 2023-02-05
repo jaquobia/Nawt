@@ -1,14 +1,19 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "net.glasslauncher.example.mixin",
+  "package": "io.jaquobia.nawt.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "ExampleMixin"
   ],
   "server": [
   ],
   "client": [
+    "MixinCursor",
+    "MixinDisplay",
+    "MixinKeyboard",
+    "MixinMinecraft",
+    "MixinMinecraftApplet",
+    "MixinMouse"
   ],
   "injectors": {
     "defaultRequire": 1
