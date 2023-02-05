@@ -2,7 +2,10 @@
 
 A mod made to replace the applet rendering with a framework for any windowing library, with built-in glfw as a default
 
-This mod should work with almost any beta fabric mod since it touches mostly LWJGL classes and a 2 or 3 tiny redirects in Minecraft sources; however its build with STAPI in mind
+This mod should work with almost any beta fabric mod since it touches mostly LWJGL classes and a 2 or 3 tiny redirects in Minecraft sources; however its built with STAPI in mind
+
+## Known Issues
+Scrolling doesn't work in modded gui's for some non-apparent reason, might have to look into how STAPI retrives the scroll delta.
 
 ## Warning
 
