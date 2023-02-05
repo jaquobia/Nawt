@@ -49,17 +49,6 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
 
         Glfw.glfwMakeContextCurrent(window);
         Glfw.glfwShowWindow(window);
-
-        // Pass in a fake context, so we can just use opengl.
-        try {
-            GLContext.useContext(new Object());
-        } catch (LWJGLException e) {
-            throw new RuntimeException(e);
-        }
-
-        GL11.glViewport(0, 0, width, height);
-
-        Nawt.LOGGER.info("Attached OpenGL 3.3 to window!");
     }
 
     @Override
@@ -171,11 +160,10 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
 
     @Override
     public void windowFramebufferSize(long window, int width, int height) {
-        Nawt.LOGGER.info("resizing " + width + " " + height);
         this.width = width;
         this.height = height;
-//        openScreen(currentScreen);
         GL11.glViewport(0, 0, width, height);
+        NawtMinecraft.Resize(width, height);
     }
 
     @Override

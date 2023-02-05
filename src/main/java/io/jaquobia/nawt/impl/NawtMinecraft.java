@@ -8,6 +8,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.Session;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GLContext;
 
 import java.util.function.Supplier;
 
@@ -36,7 +38,7 @@ public class NawtMinecraft extends Minecraft {
     public static void runWindow(int width, int height, boolean fullscreen, String username, String host, String port) {
         INSTANCE = new NawtMinecraft(width, height, fullscreen, username, host, port);
         try {
-//            INSTANCE.internalCreateWM();
+            INSTANCE.internalCreateWM();
             INSTANCE.mcThread.start();
             INSTANCE.mcThread.join(); // Pause this thread until the window is done
 //            INSTANCE.internalDestroyWM();
@@ -68,6 +70,10 @@ public class NawtMinecraft extends Minecraft {
         INSTANCE.scheduleStop();
     }
 
+    public static void Resize(int width, int height) {
+        INSTANCE.updateScreenResolution(width, height);
+    }
+
     /**
      *  Create the WM at the start of the run cycle
      */
@@ -78,6 +84,17 @@ public class NawtMinecraft extends Minecraft {
     public void internalCreateWM() {
         wm = wmSupplier.get();
         wm.create(width, height);
+
+        // Pass in a fake context, so we can just use opengl.
+        try {
+            GLContext.useContext(new Object());
+        } catch (LWJGLException e) {
+            throw new RuntimeException(e);
+        }
+
+        GL11.glViewport(0, 0, width, height);
+        GL11.glClearColor(0.5f, 0.0f, 0.5f, 1.0f);
+        Nawt.LOGGER.info("Created OpenGL 3.3 context!");
     }
 
     /**
