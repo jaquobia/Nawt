@@ -15,8 +15,15 @@ public interface WindowManager {
 
     int getWidth();
     int getHeight();
+    int getMouseX();
+    int getMouseY();
+    int getMouseDX();
+    int getMouseDY();
 
     boolean isMouseButtonDown(int button);
     boolean isMouseGrabbed();
     void setMouseGrab(boolean grab);
+    void resetMouse();
+    int getMouseScroll();
+    boolean isKeyDown(int key);
 }

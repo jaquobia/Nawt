@@ -11,6 +11,8 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 // "modmenu": [ "io.jaquobia.nawt.integration.NawtModMenuImpl" ],
@@ -19,18 +21,37 @@ public class NawtMinecraft extends Minecraft {
 
     private static NawtMinecraft INSTANCE;
 
-    public static boolean NextMouse = false;
-
     private WindowManager wm;
     private Supplier<WindowManager> wmSupplier = IntegratedGlfwWM::new;
+
+    List<MouseEvent> mouseEvents;
+    List<KeyboardEvent> keyboardEvents;
+    List<ScrollEvent> scrollEvents;
+
+    record MouseEvent(int button, boolean state, int x, int y, int dx, int dy) {}
+    record KeyboardEvent(int button, boolean state, int modifiers, char character) {}
+    record ScrollEvent(int delta) {}
+
+    /// General Usage Variables
     Thread mcThread;
     public int lastFpsLimit;
     private boolean isCloseRequested = false;
 
-    public int mouseX = 0, mouseY = 0;
-    public int mouseDX = 0, mouseDY = 0;
-    public boolean currentMouseButtonState = false;
-    public int currentMouseButton = 0;
+    /// Current Mouse Event
+    private int currentMouseButton = 0;
+    private boolean currentMouseButtonState = false;
+    private int mouseX = 0, mouseY = 0;
+    private int mouseDX = 0, mouseDY = 0;
+
+    /// Current Keyboard Event
+//    private KeyboardEvent currentKeyboardEvent;
+    private int currentKeyboardButton = 0;
+    private boolean currentKeyboardButtonState = false;
+    private int currentKeyboardButtonModifiers = 0;
+    private char currentKeyboardButtonCharacter = '\0';
+
+    /// Current Scroll Event
+    private int currentScrollDelta = 0;
 
     public NawtMinecraft(int width, int height, boolean fullscreen, String username, String host, String port) {
         super(null, null, null, width, height, fullscreen); // This also fixes the quit button
@@ -40,6 +61,10 @@ public class NawtMinecraft extends Minecraft {
         this.session = new Session(username, "");
         this.mcApplet = null;
         this.isApplet = false;
+
+        keyboardEvents = new ArrayList<>();
+        mouseEvents = new ArrayList<>();
+        scrollEvents = new ArrayList<>();
     }
 
     public static void runWindow(int width, int height, boolean fullscreen, String username, String host, String port) {
@@ -110,46 +135,109 @@ public class NawtMinecraft extends Minecraft {
         return INSTANCE.isCloseRequested;
     }
 
-    public static void SetMousePosition(int mouseX, int mouseY) {
-        INSTANCE.mouseX = mouseX;
-        INSTANCE.mouseY = mouseY;
+    public static boolean NextKeyboard() {
+        if (INSTANCE.keyboardEvents.size() > 0) {
+            KeyboardEvent event = INSTANCE.keyboardEvents.remove(0);
+            INSTANCE.currentKeyboardButton = event.button;
+            INSTANCE.currentKeyboardButtonState = event.state;
+            INSTANCE.currentKeyboardButtonModifiers = event.modifiers;
+            INSTANCE.currentKeyboardButtonCharacter = event.character;
+            return true;
+        }
+        INSTANCE.currentKeyboardButton = 0;
+        INSTANCE.currentKeyboardButtonState = false;
+        INSTANCE.currentKeyboardButtonModifiers = 0;
+        INSTANCE.currentKeyboardButtonCharacter = '\0';
+        return false;
+    }
+
+    public static int NumberEventsKeyboard() {
+        return INSTANCE.keyboardEvents.size();
+    }
+
+    public static boolean NextMouse() {
+        if (INSTANCE.mouseEvents.size() > 0) {
+            MouseEvent event = INSTANCE.mouseEvents.remove(0);
+            INSTANCE.currentMouseButton = event.button;
+            INSTANCE.currentMouseButtonState = event.state;
+            return true;
+        }
+        INSTANCE.currentMouseButton = -1;
+        INSTANCE.currentMouseButtonState = true;
+        return false;
+    }
+
+    public static int NumberEventsMouse() {
+        return INSTANCE.mouseEvents.size();
+    }
+
+    public static boolean NextEventScroll() {
+        if (INSTANCE.scrollEvents.size() > 0) {
+            ScrollEvent event = INSTANCE.scrollEvents.remove(0);
+            INSTANCE.currentScrollDelta = event.delta;
+            return true;
+        }
+        INSTANCE.currentScrollDelta = 0;
+        return false;
+    }
+
+    public static int NumberEventsScroll() {
+        return INSTANCE.scrollEvents.size();
+    }
+
+    public static void PushMouseDeltaEvent(int mouseDX, int mouseDY) {
+        INSTANCE.mouseEvents.add(new MouseEvent(-1, false, 0, 0, mouseDX, mouseDY));
+    }
+    public static void PushMousePositionEvent(int mouseX, int mouseY) {
+        INSTANCE.mouseEvents.add(new MouseEvent(-1, false, mouseX, mouseY, 0, 0));
+    }
+    public static void PushMouseButtonEvent(int button, boolean buttonState) {
+        INSTANCE.mouseEvents.add(new MouseEvent(button, buttonState, 0, 0, 0, 0));
+    }
+    public static void PushKeyboardEvent(int key, boolean state, int modifiers, char character) {
+        INSTANCE.keyboardEvents.add(new KeyboardEvent(key, state, modifiers, character));
+    }
+    public static void PushScrollEvent(int delta) {
+        INSTANCE.scrollEvents.add(new ScrollEvent(delta));
+    }
+
+    public static int GetEventMouseX() {
+        return INSTANCE.mouseX;
+    }
+    public static int GetEventMouseY() {
+        return INSTANCE.mouseY;
+    }
+    public static int GetEventMouseDX() {
+        return INSTANCE.mouseDX;
+    }
+    public static int GetEventMouseDY() {
+        return INSTANCE.mouseDY;
     }
 
     public static int GetMouseX() {
-        return INSTANCE.mouseX;
+        return INSTANCE.wm.getMouseX();
     }
     public static int GetMouseY() {
-        return INSTANCE.mouseY;
+        return INSTANCE.wm.getMouseY();
     }
+    public static int GetMouseDX() {
+        return INSTANCE.wm.getMouseDX();
+    }
+    public static int GetMouseDY() {
+        return INSTANCE.wm.getMouseDY();
+    }
+
     public static boolean GetMouseButtonDown(int button) {
         return INSTANCE.wm.isMouseButtonDown(button);
     }
 
-    public static void SetCurrentMouseButton(int button, boolean buttonState) {
-        INSTANCE.currentMouseButton = button;
-        INSTANCE.currentMouseButtonState = buttonState;
-        NextMouse = true;
-    }
-
-    public static int GetCurrentMouseButton() {
+    public static int GetEventMouseButton() {
         return INSTANCE.currentMouseButton;
     }
-    public static boolean GetCurrentMouseButtonState() {
+    public static boolean GetEventMouseButtonState() {
         return INSTANCE.currentMouseButtonState;
     }
 
-    public static void SetMouseDXY(int dx, int dy) {
-        INSTANCE.mouseDX = dx;
-        INSTANCE.mouseDY = dy;
-    }
-
-    public static int GetMouseDX() {
-        return INSTANCE.mouseDX;
-    }
-
-    public static int GetMouseDY() {
-        return INSTANCE.mouseDY;
-    }
 
     public static void SetMouseGrabbed(boolean grab) {
         INSTANCE.wm.setMouseGrab(grab);
@@ -158,6 +246,29 @@ public class NawtMinecraft extends Minecraft {
     public static boolean GetMouseGrabbed() {
         return INSTANCE.wm.isMouseGrabbed();
     }
+
+    public static int GetMouseScroll() {
+        return INSTANCE.wm.getMouseScroll();
+    }
+
+    public static int GetCurrentKeyboardButton() {
+        return INSTANCE.currentKeyboardButton;
+    }
+    public static boolean GetCurrentKeyboardButtonState() {
+        return INSTANCE.currentKeyboardButtonState;
+    }
+    public static int GetCurrentKeyboardButtonModifiers() {
+        return INSTANCE.currentKeyboardButtonModifiers;
+    }
+
+    public static char GetCurrentKeyboardButtonChar() {
+        return INSTANCE.currentKeyboardButtonCharacter;
+    }
+
+    public static boolean GetKeyDown(int key) {
+        return INSTANCE.wm.isKeyDown(key);
+    }
+
     /**
      *  Create the WM at the start of the run cycle
      *  Useful for static environments with no access to INSTANCE

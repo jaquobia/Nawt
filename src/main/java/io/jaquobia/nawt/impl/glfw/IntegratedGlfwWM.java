@@ -5,6 +5,10 @@ import io.github.jaquobia.GlfwCallback;
 import io.jaquobia.nawt.Nawt;
 import io.jaquobia.nawt.api.WindowManager;
 import io.jaquobia.nawt.impl.NawtMinecraft;
+import org.lwjgl.input.Keyboard;
+
+import static io.jaquobia.nawt.impl.glfw.LwjglToGlfwHelper.translateKeyToGlfw;
+import static io.jaquobia.nawt.impl.glfw.LwjglToGlfwHelper.translateKeyToLWJGL;
 
 public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
 
@@ -108,6 +112,16 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
     }
 
     @Override
+    public int getMouseX() {
+        return mouseX;
+    }
+
+    @Override
+    public int getMouseY() {
+        return mouseY;
+    }
+
+    @Override
     public boolean isMouseButtonDown(int button) {
         return Glfw.glfwGetMouseButton(window, button) >= Glfw.GLFW_PRESS;
     }
@@ -124,13 +138,35 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
         } else {
             Glfw.glfwSetInputMode(window, Glfw.GLFW_CURSOR, Glfw.GLFW_CURSOR_NORMAL);
         }
+        resetMouse();
+    }
+
+    @Override
+    public void resetMouse() {
+        mouseDX = mouseDY = mouseScroll = 0;
+    }
+
+    @Override
+    public int getMouseScroll() {
+        int lMouseScroll = mouseScroll;
+        mouseScroll = 0;
+        return lMouseScroll;
+    }
+
+    @Override
+    public boolean isKeyDown(int key) {
+        if (key == Keyboard.KEY_NONE) return false;
+        return Glfw.glfwGetKey(window, translateKeyToGlfw(key)) >= Glfw.GLFW_PRESS;
     }
     /// End WM functions
 
     /// Start Glfw Callbacks
     @Override
     public void error(int error, String description) {
+        boolean mouse_grab = isMouseGrabbed();
+        setMouseGrab(false);
         Nawt.LOGGER.error(String.format("GlfwError(%d): %s", error, description));
+        setMouseGrab(mouse_grab);
     }
 
     @Override
@@ -206,6 +242,8 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
 
         // Key is non-shift-modifiable
         currentKeyboardButtonCharacter = currentKeyboardButton == Glfw.GLFW_KEY_SPACE ? ' ' : '\0';
+
+        NawtMinecraft.PushKeyboardEvent(translateKeyToLWJGL(currentMouseButton), currentKeyboardButtonState, currentKeyboardButtonModifiers, currentKeyboardButtonCharacter);
     }
 
     public String getKeyName() {
@@ -221,6 +259,7 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
             } else
                 currentKeyboardButtonCharacter = (char) codepoint;
         }
+        NawtMinecraft.PushKeyboardEvent(translateKeyToLWJGL(currentMouseButton), currentKeyboardButtonState, currentKeyboardButtonModifiers, currentKeyboardButtonCharacter);
     }
 
     @Override
@@ -236,7 +275,7 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
     public void mouseButton(long window, int button, boolean pressed, int mods) {
         currentMouseButtonState = pressed;
         currentMouseButton = button;
-        NawtMinecraft.SetCurrentMouseButton(button, pressed);
+        NawtMinecraft.PushMouseButtonEvent(button, pressed);
     }
 
     public int getMouseDX() {
@@ -260,8 +299,7 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
         this.mouseDX += this.mouseX - this.mouseLX;
         this.mouseDY += this.mouseY - this.mouseLY;
 
-        NawtMinecraft.SetMousePosition(this.mouseX, this.mouseY);
-        NawtMinecraft.SetMouseDXY(mouseDX, mouseDY);
+        NawtMinecraft.PushMousePositionEvent(this.mouseX, this.mouseY);
     }
 
     @Override
@@ -271,7 +309,9 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
 
     @Override
     public void scroll(long window, double scrollX, double scrollY) {
-        mouseScroll = (int)scrollY;
+        int delta = (int)scrollY;
+        mouseScroll += delta;
+        NawtMinecraft.PushScrollEvent(delta);
     }
     /// END GLFW CALLBACKS
 }

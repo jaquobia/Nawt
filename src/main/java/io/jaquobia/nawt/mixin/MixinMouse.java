@@ -24,11 +24,11 @@ public class MixinMouse {
     }
     @Inject(method = "getEventX",at = @At("HEAD"), cancellable = true, remap = false)
     private static void injectMouseEventX(CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(NawtMinecraft.GetMouseX());
+        cir.setReturnValue(NawtMinecraft.GetEventMouseX());
     }
     @Inject(method = "getEventY",at = @At("HEAD"), cancellable = true, remap = false)
     private static void injectMouseEventY(CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(NawtMinecraft.GetMouseY());
+        cir.setReturnValue(NawtMinecraft.GetEventMouseY());
     }
     @Inject(method = "isButtonDown",at = @At("HEAD"), cancellable = true, remap = false)
     private static void injectIsButtonDown(int button, CallbackInfoReturnable<Boolean> cir) {
@@ -37,8 +37,7 @@ public class MixinMouse {
 
     @Inject(method = "next",at = @At("HEAD"), cancellable = true, remap = false)
     private static void injectNext(CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(NawtMinecraft.NextMouse);
-        NawtMinecraft.NextMouse = false;
+        cir.setReturnValue(NawtMinecraft.NextMouse());
     }
 
     @Inject(method = "getButtonIndex", at = @At("HEAD"), remap = false, cancellable = true)
@@ -49,12 +48,14 @@ public class MixinMouse {
 
     @Inject(method = "getEventButtonState", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetEventButtonState(CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(NawtMinecraft.GetCurrentMouseButtonState());
+        Nawt.LOGGER.info("getting event mouse button state: " + NawtMinecraft.GetEventMouseButtonState());
+        cir.setReturnValue(NawtMinecraft.GetEventMouseButtonState());
     }
 
     @Inject(method = "getEventButton", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetEventButton(CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(NawtMinecraft.GetCurrentMouseButton());
+        Nawt.LOGGER.info("getting event button: " + NawtMinecraft.GetEventMouseButton());
+        cir.setReturnValue(NawtMinecraft.GetEventMouseButton());
     }
     @Inject(method = "isCreated", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectIsCreated(CallbackInfoReturnable<Boolean> cir) {
@@ -63,28 +64,28 @@ public class MixinMouse {
 
     @Inject(method = "getEventDX", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetEventDX(CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(NawtMinecraft.GetMouseDX());
+        cir.setReturnValue(NawtMinecraft.GetEventMouseDX());
     }
     @Inject(method = "getEventDY", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetEventDY(CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(NawtMinecraft.GetMouseDY());
+        cir.setReturnValue(NawtMinecraft.GetEventMouseDY());
     }
     @Inject(method = "getDX", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetDX(CallbackInfoReturnable<Integer> cir) {
-//        cir.setReturnValue(GlfwMinecraft.INSTANCE.mouseDX);
+        cir.setReturnValue(NawtMinecraft.GetMouseDX());
     }
     @Inject(method = "getDY", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetDY(CallbackInfoReturnable<Integer> cir) {
-//        cir.setReturnValue(GlfwMinecraft.INSTANCE.mouseDY);
+        cir.setReturnValue(NawtMinecraft.GetMouseDY());
     }
 
     @Inject(method = "getEventDWheel", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetEventDWheel(CallbackInfoReturnable<Integer> cir) {
-//        cir.setReturnValue(GlfwMinecraft.INSTANCE.mouseScroll);
+        cir.setReturnValue(NawtMinecraft.GetMouseScroll());
     }
     @Inject(method = "getDWheel", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetDWheel(CallbackInfoReturnable<Integer> cir) {
-//        cir.setReturnValue(GlfwMinecraft.INSTANCE.mouseScroll);
+        cir.setReturnValue(NawtMinecraft.GetMouseScroll());
     }
 
     @Inject(method = "create()V", at = @At("HEAD"), remap = false, cancellable = true)
