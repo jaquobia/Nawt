@@ -53,4 +53,20 @@ public class MixinDisplay {
     private static void injectCreate(CallbackInfo ci) {
         ci.cancel();
     }
+
+    @Inject(method = "create(Lorg/lwjgl/opengl/PixelFormat;)V", at = @At("HEAD"), cancellable = true, remap = false)
+    private static void injectCreate2(CallbackInfo ci) {
+        ci.cancel();
+    }
+
+    @Inject(method = "setTitle", at = @At("HEAD"), cancellable = true, remap = false)
+    private static void injectSetTitle(String newTitle, CallbackInfo ci) {
+        NawtMinecraft.SetTitle(newTitle);
+        ci.cancel();
+    }
+
+    @Inject(method = "isCloseRequested", at = @At("HEAD"), cancellable = true, remap = false)
+    private static void injectIsCloseRequested(CallbackInfoReturnable<Boolean> cir) {
+        cir.setReturnValue(NawtMinecraft.IsCloseRequested());
+    }
 }

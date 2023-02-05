@@ -8,9 +8,15 @@ public interface WindowManager {
     void swapBuffers();
     void pollEvents();
 
+    void setTitle(String title);
+
     int getWindowX();
     int getWindowY();
 
     int getWidth();
     int getHeight();
+
+    boolean isMouseButtonDown(int button);
+    boolean isMouseGrabbed();
+    void setMouseGrab(boolean grab);
 }

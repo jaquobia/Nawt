@@ -5,9 +5,6 @@ import io.github.jaquobia.GlfwCallback;
 import io.jaquobia.nawt.Nawt;
 import io.jaquobia.nawt.api.WindowManager;
 import io.jaquobia.nawt.impl.NawtMinecraft;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GLContext;
 
 public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
 
@@ -87,6 +84,11 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
     }
 
     @Override
+    public void setTitle(String title) {
+        Glfw.glfwSetWindowTitle(window, title);
+    }
+
+    @Override
     public int getWindowX() {
         return x;
     }
@@ -103,6 +105,25 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
     @Override
     public int getHeight() {
         return height;
+    }
+
+    @Override
+    public boolean isMouseButtonDown(int button) {
+        return Glfw.glfwGetMouseButton(window, button) >= Glfw.GLFW_PRESS;
+    }
+
+    @Override
+    public boolean isMouseGrabbed() {
+        return Glfw.glfwGetInputMode(window, Glfw.GLFW_CURSOR) == Glfw.GLFW_CURSOR_HIDDEN;
+    }
+
+    @Override
+    public void setMouseGrab(boolean grab) {
+        if (grab) {
+            Glfw.glfwSetInputMode(window, Glfw.GLFW_CURSOR, Glfw.GLFW_CURSOR_DISABLED);
+        } else {
+            Glfw.glfwSetInputMode(window, Glfw.GLFW_CURSOR, Glfw.GLFW_CURSOR_NORMAL);
+        }
     }
     /// End WM functions
 
@@ -134,7 +155,7 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
     @Override
     public void windowClose(long window) {
         if (window == this.window) {
-            NawtMinecraft.Terminate();
+            NawtMinecraft.RequestClose();
         }
     }
 
@@ -162,7 +183,6 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
     public void windowFramebufferSize(long window, int width, int height) {
         this.width = width;
         this.height = height;
-        GL11.glViewport(0, 0, width, height);
         NawtMinecraft.Resize(width, height);
     }
 
@@ -216,6 +236,7 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
     public void mouseButton(long window, int button, boolean pressed, int mods) {
         currentMouseButtonState = pressed;
         currentMouseButton = button;
+        NawtMinecraft.SetCurrentMouseButton(button, pressed);
     }
 
     public int getMouseDX() {
@@ -238,6 +259,9 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
         this.mouseY = this.height - (int) y;
         this.mouseDX += this.mouseX - this.mouseLX;
         this.mouseDY += this.mouseY - this.mouseLY;
+
+        NawtMinecraft.SetMousePosition(this.mouseX, this.mouseY);
+        NawtMinecraft.SetMouseDXY(mouseDX, mouseDY);
     }
 
     @Override

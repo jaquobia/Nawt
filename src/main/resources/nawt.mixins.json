@@ -13,7 +13,8 @@
     "MixinKeyboard",
     "MixinMinecraft",
     "MixinMinecraftApplet",
-    "MixinMouse"
+    "MixinMouse",
+    "MixinController"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -1,9 +1,11 @@
 package io.jaquobia.nawt.mixin;
 
+import io.jaquobia.nawt.impl.NawtMinecraft;
 import org.lwjgl.input.Keyboard;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Keyboard.class)
@@ -12,6 +14,7 @@ public class MixinKeyboard {
     private static void injectIsKeyDown(int key, CallbackInfoReturnable<Boolean> cir) {
 //        int glfwKey = translateKeyToGlfw(key);
 //        cir.setReturnValue(Glfw.glfwGetKey(GlfwMinecraft.INSTANCE.window, glfwKey) >= Glfw.GLFW_PRESS);
+        cir.setReturnValue(false);
     }
     @Inject(method = "next", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectNext(CallbackInfoReturnable<Boolean> cir) {
@@ -32,6 +35,11 @@ public class MixinKeyboard {
     }
     @Inject(method = "getEventKeyState", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetEventKeyState(CallbackInfoReturnable<Boolean> cir) {
-//        cir.setReturnValue(GlfwMinecraft.INSTANCE.currentKeyboardButtonState);
+        cir.setReturnValue(false);
+    }
+
+    @Inject(method = "create()V", at = @At("HEAD"), remap = false, cancellable = true)
+    private static void injectGetEventKeyState(CallbackInfo ci) {
+        ci.cancel();
     }
 }

@@ -7,6 +7,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Inject creation and termination of the WM into the head and tail Minecraft.run() function - compats with stapi
+ */
 @Mixin(Minecraft.class)
 public class MixinMinecraft {
     @Inject(method = "run", at = @At("HEAD"), remap = false)
