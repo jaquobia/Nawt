@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+/// This is extracted code from the fabric.mod.json entrypoints because it was causing crashes
 // "modmenu": [ "io.jaquobia.nawt.integration.NawtModMenuImpl" ],
 
 @Environment(EnvType.CLIENT)
@@ -188,12 +189,10 @@ public class NawtMinecraft extends Minecraft {
         INSTANCE.mouseEvents.add(new MouseEvent(button, buttonState, GetMouseX(), GetMouseY(), GetMouseDX(), GetMouseDY(), 0));
     }
     public static void PushKeyboardEvent(int key, boolean state, int modifiers, char character) {
-        Nawt.LOGGER.info("T: " + key + " ?" + character + " " + state);
         INSTANCE.keyboardEvents.add(new KeyboardEvent(key, state, modifiers, character));
     }
     public static void PushScrollEvent(int delta) {
-//        INSTANCE.scrollEvents.add(new ScrollEvent(delta));
-        INSTANCE.mouseEvents.add(new MouseEvent(-1, false, 0, 0, 0, 0, delta));
+        INSTANCE.mouseEvents.add(new MouseEvent(-1, false, GetMouseX(), GetMouseY(), GetMouseDX(), GetMouseDY(), delta));
     }
 
     public static int GetEventMouseX() {

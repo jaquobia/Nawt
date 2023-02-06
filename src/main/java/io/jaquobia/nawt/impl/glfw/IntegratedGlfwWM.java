@@ -250,7 +250,6 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
 
         // Key is non-shift-modifiable
         currentKeyboardButtonCharacter = currentKeyboardButton == Glfw.GLFW_KEY_SPACE ? ' ' : '\0';
-        Nawt.LOGGER.info("B");
         NawtMinecraft.PushKeyboardEvent(translateKeyToLWJGL(currentKeyboardButton), currentKeyboardButtonState, currentKeyboardButtonModifiers, currentKeyboardButtonCharacter);
     }
 
@@ -266,7 +265,6 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
                 currentKeyboardButtonCharacter = 22;
             } else
                 currentKeyboardButtonCharacter = (char) codepoint;
-            Nawt.LOGGER.info("A");
             NawtMinecraft.PushKeyboardEvent(translateKeyToLWJGL(currentKeyboardButton), currentKeyboardButtonState, currentKeyboardButtonModifiers, currentKeyboardButtonCharacter);
         }
 
@@ -319,7 +317,8 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
 
     @Override
     public void scroll(long window, double scrollX, double scrollY) {
-        int delta = (int)scrollY;
+        int delta = (int)(scrollY * 100.0);
+//        Nawt.LOGGER.info("Scrolling: " + delta);
         mouseScroll += delta;
         NawtMinecraft.PushScrollEvent(delta);
     }
