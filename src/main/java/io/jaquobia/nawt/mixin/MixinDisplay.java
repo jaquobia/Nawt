@@ -41,6 +41,7 @@ public class MixinDisplay {
 
     @Inject(method = "setFullscreen", at = @At("HEAD"), cancellable = true, remap = false)
     private static void injectSetFullscreen(boolean fullscreen, CallbackInfo ci) {
+        NawtMinecraft.ToggleFullscreen();
         ci.cancel();
     }
 

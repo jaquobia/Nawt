@@ -111,6 +111,10 @@ public class NawtMinecraft extends Minecraft {
         INSTANCE.updateScreenResolution(width, height);
     }
 
+    public static void ResizeNoGL(int width, int height) {
+        INSTANCE.updateScreenResolution(width, height);
+    }
+
     /**
      * Tells the WindowMangaer to set the title of the window
      * @param title the new title of the window
@@ -275,8 +279,7 @@ public class NawtMinecraft extends Minecraft {
      */
     public void internalCreateWM() {
         wm = wmSupplier.get();
-        wm.create(width, height);
-
+        wm.create(width, height, isFullscreen);
         // Pass in a fake context, so we can just use opengl.
         try {
             GLContext.useContext(new Object());
@@ -284,6 +287,7 @@ public class NawtMinecraft extends Minecraft {
             throw new RuntimeException(e);
         }
 
+        wm.pollEvents();
         Nawt.LOGGER.info("Created OpenGL 3.3 context!");
     }
 
@@ -310,6 +314,10 @@ public class NawtMinecraft extends Minecraft {
         INSTANCE.internalPollEvents();
     }
 
+    public static void ToggleFullscreen() {
+        INSTANCE.wm.toggleFullscreen();
+    }
+
     /**
      * Internal poll events
      */
@@ -323,30 +331,25 @@ public class NawtMinecraft extends Minecraft {
     public void toggleFullscreen() {
         this.isFullscreen = !this.isFullscreen;
         if (this.isFullscreen) {
-            wm.toggleFullscreen();
-            this.actualWidth = Display.getDisplayMode().getWidth();
-            this.actualHeight = Display.getDisplayMode().getHeight();
+//            this.actualWidth = Display.getDisplayMode().getWidth();
+//            this.actualHeight = Display.getDisplayMode().getHeight();
 
         } else {
-            this.actualWidth = this.width;
+            this.actualWidth = this.width / 2;
             this.actualHeight = this.height;
         }
-        if (this.actualWidth <= 0) {
-            this.actualWidth = 1;
-        }
-        if (this.actualHeight <= 0) {
-            this.actualHeight = 1;
-        }
+//        if (this.actualWidth <= 0) {
+//            this.actualWidth = 1;
+//        }
+//        if (this.actualHeight <= 0) {
+//            this.actualHeight = 1;
+//        }
 
         if (this.currentScreen != null) {
             this.updateScreenResolution(this.actualWidth, this.actualHeight);
         }
 
-        try {
-            Display.setFullscreen(this.isFullscreen);
-        } catch (LWJGLException e) {
-            throw new RuntimeException(e);
-        }
+        wm.toggleFullscreen();
         Display.update();
     }
 

@@ -1,7 +1,7 @@
 package io.jaquobia.nawt.api;
 
 public interface WindowManager {
-    void create(int width, int height);
+    void create(int width, int height, boolean fullscreen);
     void destroy();
 
     void toggleFullscreen();
