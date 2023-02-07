@@ -251,7 +251,6 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
 
     @Override
     public void windowFramebufferSize(long window, int width, int height) {
-         Nawt.LOGGER.info("RESIZE EVENT: WIDTH " + width + " HEIGHT " + height);
          NawtMinecraft.Resize(width, height);
     }
 
