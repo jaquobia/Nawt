@@ -335,15 +335,15 @@ public class NawtMinecraft extends Minecraft {
 //            this.actualHeight = Display.getDisplayMode().getHeight();
 
         } else {
-            this.actualWidth = this.width / 2;
+            this.actualWidth = this.width;
             this.actualHeight = this.height;
         }
-//        if (this.actualWidth <= 0) {
-//            this.actualWidth = 1;
-//        }
-//        if (this.actualHeight <= 0) {
-//            this.actualHeight = 1;
-//        }
+        if (this.actualWidth <= 0) {
+            this.actualWidth = 1;
+        }
+        if (this.actualHeight <= 0) {
+            this.actualHeight = 1;
+        }
 
         if (this.currentScreen != null) {
             this.updateScreenResolution(this.actualWidth, this.actualHeight);

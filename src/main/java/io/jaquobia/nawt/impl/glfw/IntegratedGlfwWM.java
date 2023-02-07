@@ -2,6 +2,7 @@ package io.jaquobia.nawt.impl.glfw;
 
 import io.github.jaquobia.Glfw;
 import io.github.jaquobia.GlfwCallback;
+import io.github.jaquobia.GlfwVideoMode;
 import io.jaquobia.nawt.Nawt;
 import io.jaquobia.nawt.api.WindowManager;
 import io.jaquobia.nawt.impl.NawtMinecraft;
@@ -18,7 +19,6 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
     static boolean glfwInit = Glfw.glfwInit(); // A nice way to initialize glfw and report it at the same time
 
     public long window;
-    public int x, y, width, height;
     public int old_x, old_y, old_width, old_height; // used for fullscreen
     public int mouseX = 0, mouseY = 0;
     public int mouseLX = 0, mouseLY = 0; // used for Mouse.DX() mouse.DY()
@@ -36,8 +36,6 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
     public char currentKeyboardButtonCharacter = '\0';
 
     public boolean fullscreen = false;
-    public boolean releasingFullscreen = false;
-    public boolean disableNextResizeFromFullscreen = false;
 
     /// WindowManager functions
     @Override
@@ -57,10 +55,7 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
         Glfw.glfwMakeContextCurrent(window);
         Glfw.glfwShowWindow(window);
 
-        // Get the actual size given to the window
-        this.width = Glfw.glfwGetWindowWidth(window);
-        this.height = Glfw.glfwGetWindowHeight(window);
-        NawtMinecraft.ResizeNoGL(this.width, this.height);
+//        NawtMinecraft.ResizeNoGL(Glfw.glfwGetWindowWidth(window), Glfw.glfwGetWindowHeight(window));
     }
 
     @Override
@@ -73,22 +68,31 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
     @Override
     public void toggleFullscreen() {
         this.fullscreen = !this.fullscreen;
+        long monitor = Glfw.glfwGetCurrentWindowMonitor(window);
+        GlfwVideoMode videoMode = Glfw.glfwGetVideoMode(monitor);
+        int new_x;
+        int new_y;
+        int new_width;
+        int new_height;
         if (fullscreen) {
-            old_x = x;
-            old_y = y;
-            old_width = width;
-            old_height = height;
-            disableNextResizeFromFullscreen = false;
-            releasingFullscreen = false;
-            Glfw.glfwSetCurrentWindowMonitor(window);
+            old_x = Glfw.glfwGetWindowX(window);
+            old_y = Glfw.glfwGetWindowY(window);
+            old_width = Glfw.glfwGetWindowWidth(window);
+            old_height = Glfw.glfwGetWindowHeight(window);
+
+            new_x = 0;
+            new_y = 0;
+            new_width = videoMode.width;
+            new_height = videoMode.height;
         } else {
-            this.x = old_x;
-            this.y = old_y;
-            this.width = old_width;
-            this.height = old_height;
-            releasingFullscreen = true;
-            Glfw.glfwSetWindowMonitor(window, 0, x, y, width, height, Glfw.GLFW_DONT_CARE);
+            monitor = 0;
+
+            new_x = old_x;
+            new_y = old_y;
+            new_width = old_width;
+            new_height = old_height;
         }
+        Glfw.glfwSetWindowMonitor(window, monitor, new_x, new_y, new_width, new_height, Glfw.GLFW_DONT_CARE);
     }
 
     @Override
@@ -113,11 +117,11 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
 
     @Override
     public int getWindowX() {
-        return x;
+        return Glfw.glfwGetWindowX(window);
     }
     @Override
     public int getWindowY() {
-        return y;
+        return Glfw.glfwGetWindowY(window);
     }
 
     public int getMouseDX() {
@@ -134,12 +138,12 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
 
     @Override
     public int getWidth() {
-        return width;
+        return Glfw.glfwGetWindowWidth(window);
     }
 
     @Override
     public int getHeight() {
-        return height;
+        return Glfw.glfwGetWindowHeight(window);
     }
 
     @Override
@@ -211,8 +215,7 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
 
     @Override
     public void windowPos(long window, int x, int y) {
-        this.x = x;
-        this.y = y;
+
     }
 
     @Override
@@ -248,16 +251,6 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
 
     @Override
     public void windowFramebufferSize(long window, int width, int height) {
-//        if (disableNextResizeFromFullscreen) {
-//            disableNextResizeFromFullscreen = false;
-//            return;
-//        }
-//        if (releasingFullscreen) {
-//            releasingFullscreen = false;
-//            disableNextResizeFromFullscreen = true;
-//        }
-         this.width = width;
-         this.height = height;
          Nawt.LOGGER.info("RESIZE EVENT: WIDTH " + width + " HEIGHT " + height);
          NawtMinecraft.Resize(width, height);
     }
@@ -323,7 +316,7 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
         this.mouseLX = this.mouseX;
         this.mouseLY = this.mouseY;
         this.mouseX = (int) x;
-        this.mouseY = this.height - (int) y;
+        this.mouseY = this.getHeight() - (int) y;
         this.mouseDX += this.mouseX - this.mouseLX;
         this.mouseDY += this.mouseY - this.mouseLY;
 
@@ -338,7 +331,6 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
     @Override
     public void scroll(long window, double scrollX, double scrollY) {
         int delta = (int)(scrollY * 100.0);
-//        Nawt.LOGGER.info("Scrolling: " + delta);
         mouseScroll += delta;
         NawtMinecraft.PushScrollEvent(delta);
     }
