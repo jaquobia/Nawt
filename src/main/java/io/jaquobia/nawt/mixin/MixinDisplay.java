@@ -70,4 +70,10 @@ public class MixinDisplay {
     private static void injectIsCloseRequested(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(NawtMinecraft.IsCloseRequested());
     }
+
+    @Inject(method = "destroy", at = @At("HEAD"), cancellable = true, remap = false)
+    private static void injectDestroy(CallbackInfo ci) {
+        NawtMinecraft.DestroyWM();
+        ci.cancel();
+    }
 }

@@ -15,12 +15,12 @@ import java.awt.*;
 @Mixin(Minecraft.class)
 public class MixinMinecraft {
     @Inject(method = "run", at = @At("HEAD"), remap = false)
-    private void injectHeadInit(CallbackInfo ci) {
+    private void injectHeadRun(CallbackInfo ci) {
         NawtMinecraft.CreateWM();
     }
 
     @Inject(method = "run", at = @At("TAIL"), remap = false)
-    private void injectTailInit(CallbackInfo ci) {
+    private void injectTailRun(CallbackInfo ci) {
         NawtMinecraft.DestroyWM();
     }
 

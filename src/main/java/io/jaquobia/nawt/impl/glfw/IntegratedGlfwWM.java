@@ -40,6 +40,9 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
     /// WindowManager functions
     @Override
     public void create(int width, int height, boolean fullscreen) {
+        if (!glfwInit) {
+            throw new RuntimeException("Glfw not initialized!");
+        }
         if (window != 0) {
             return; // we already created a window
         }
@@ -50,17 +53,15 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
         long monitor = fullscreen ? Glfw.glfwGetPrimaryMonitor() : 0;
         window = Glfw.glfwCreateWindow(width, height, "Minecraft b1.7.3", monitor, 0);
         Glfw.glfwSetCallback(this);
-        Nawt.LOGGER.info("Created Glfw Window!");
+        Nawt.log("Created Glfw Window!");
 
         Glfw.glfwMakeContextCurrent(window);
         Glfw.glfwShowWindow(window);
-
-//        NawtMinecraft.ResizeNoGL(Glfw.glfwGetWindowWidth(window), Glfw.glfwGetWindowHeight(window));
     }
 
     @Override
     public void destroy() {
-        Nawt.LOGGER.info("Terminating GLFW window");
+        Nawt.log("Terminating GLFW window");
         Glfw.glfwDestroyWindow(window);
         Glfw.glfwTerminate();
     }
@@ -200,7 +201,7 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
     public void error(int error, String description) {
         boolean mouse_grab = isMouseGrabbed();
         setMouseGrab(false);
-        Nawt.LOGGER.error(String.format("GlfwError(%d): %s", error, description));
+        Nawt.error(String.format("GlfwError(%d): %s", error, description));
         setMouseGrab(mouse_grab);
     }
 
@@ -251,7 +252,7 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
 
     @Override
     public void windowFramebufferSize(long window, int width, int height) {
-         NawtMinecraft.Resize(width, height);
+         NawtMinecraft.PushResizeEvent(width, height);
     }
 
     @Override
@@ -291,7 +292,6 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
                 currentKeyboardButtonCharacter = (char) codepoint;
             NawtMinecraft.PushKeyboardEvent(translateKeyToLWJGL(currentKeyboardButton), currentKeyboardButtonState, currentKeyboardButtonModifiers, currentKeyboardButtonCharacter);
         }
-
     }
 
     @Override

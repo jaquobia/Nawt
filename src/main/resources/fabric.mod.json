@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "Nawt",
-  "description": "This aims to de-awt b1.7.3",
+  "description": "This aims to de-awt b1.7.3 in a non-aggressive and expandable (replaceable) way.",
   "authors": [
     "jaquobia"
   ],
@@ -18,7 +18,8 @@
 
   "environment": "client",
   "entrypoints": {
-    "gcapi": [ "io.jaquobia.nawt.integration.NawtGlassConfigImpl" ]
+    "gcapi": [ "io.jaquobia.nawt.integration.NawtGlassConfigImpl" ],
+    "nawt": [ "io.jaquobia.nawt.impl.glfw.GlfwNawtProvider" ]
   },
   "mixins": [
     "nawt.mixins.json"
@@ -29,7 +30,6 @@
   },
 
   "custom": {
-    "modmenu:api": true,
     "modmenu:clientsideOnly": true
   },
   "accessWidener": "nawt.accesswidener"

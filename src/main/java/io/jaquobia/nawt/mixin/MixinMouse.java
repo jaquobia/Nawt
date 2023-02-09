@@ -42,7 +42,7 @@ public class MixinMouse {
 
     @Inject(method = "getButtonIndex", at = @At("HEAD"), remap = false, cancellable = true)
     private static void injectGetButtonIndex(String buttonName, CallbackInfoReturnable<Integer> cir) {
-        Nawt.LOGGER.info("Getting button" + buttonName);
+        Nawt.debug("Getting button" + buttonName + "; If you see this message, report it on the Nawt github");
 //        cir.setReturnValue(GlfwMinecraft.INSTANCE.currentMouseButton);
     }
 

@@ -1,10 +1,11 @@
 package io.jaquobia.nawt.impl;
 
 import io.jaquobia.nawt.Nawt;
+import io.jaquobia.nawt.api.NawtProvider;
 import io.jaquobia.nawt.api.WindowManager;
-import io.jaquobia.nawt.impl.glfw.IntegratedGlfwWM;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.GameStartupError;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.Session;
@@ -15,7 +16,7 @@ import org.lwjgl.opengl.GLContext;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.Optional;
 
 /// This is extracted code from the fabric.mod.json entrypoints because it was causing crashes
 // "modmenu": [ "io.jaquobia.nawt.integration.NawtModMenuImpl" ],
@@ -26,7 +27,6 @@ public class NawtMinecraft extends Minecraft {
     private static NawtMinecraft INSTANCE;
 
     private WindowManager wm;
-    private Supplier<WindowManager> wmSupplier = IntegratedGlfwWM::new;
 
     List<MouseEvent> mouseEvents;
     List<KeyboardEvent> keyboardEvents;
@@ -56,7 +56,6 @@ public class NawtMinecraft extends Minecraft {
 
     public NawtMinecraft(int width, int height, boolean fullscreen, String username, String host, String port) {
         super(null, null, null, width, height, fullscreen); // This also fixes the quit button
-
         mcThread = new Thread(this, "Minecraft main thread");
         this.width = this.actualWidth;
         this.session = new Session(username, "");
@@ -75,16 +74,8 @@ public class NawtMinecraft extends Minecraft {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        System.exit(1); // Our window closed, don't continue and open normal mc's window
-    }
-
-    /**
-     * Sets the wm supplier, to be used as mod integration until I learn how entrypoints work
-     * Use this to set a custom WindowManager, use the IntegratedGlfwWM class to learn how things should work
-     * @param supplier a non-null supplier of a WindowManager
-     */
-    public static void SetWMSupplier(Supplier<WindowManager> supplier) {
-        INSTANCE.wmSupplier = supplier;
+        // This line honestly shouldn't ever run, but in the case it does, make sure to close early
+        System.exit(1);
     }
 
     /**
@@ -106,12 +97,8 @@ public class NawtMinecraft extends Minecraft {
      * @param width the new width of the window
      * @param height the new height of the window
      */
-    public static void Resize(int width, int height) {
+    public static void PushResizeEvent(int width, int height) {
         GL11.glViewport(0, 0, width, height);
-        INSTANCE.updateScreenResolution(width, height);
-    }
-
-    public static void ResizeNoGL(int width, int height) {
         INSTANCE.updateScreenResolution(width, height);
     }
 
@@ -278,9 +265,33 @@ public class NawtMinecraft extends Minecraft {
      * An internal function to create the WM
      */
     public void internalCreateWM() {
-        wm = wmSupplier.get();
+        // This should exist somewhere in the list
+        Optional<NawtProvider> defaultGlfwProvider = Optional.empty();
+        Optional<NawtProvider> nonGlfwProvider = Optional.empty();
+
+        // Get all the entrypoints
+        List<NawtProvider> managers = FabricLoader.getInstance().getEntrypoints("nawt", NawtProvider.class);
+
+        // Should be at least a single Window Manager
+        for (NawtProvider provider : managers) {
+            if (provider.WMName().equals(Nawt.GLFW_WM_NAME)) {
+                defaultGlfwProvider = Optional.of(provider);
+            } else {
+                nonGlfwProvider = Optional.of(provider);
+                break;
+            }
+        }
+
+        Optional<NawtProvider> finalDefaultGlfwProvider = defaultGlfwProvider;
+        NawtProvider provider = nonGlfwProvider.or(
+                () -> finalDefaultGlfwProvider).orElseThrow(
+                        () -> new RuntimeException("There are no window managers, but glfw should be default")
+        );
+
+        Nawt.log("Loading " + provider.WMName() + " Window Manager");
+        wm = provider.getWMSupplier().get();
         wm.create(width, height, isFullscreen);
-        // Pass in a fake context, so we can just use opengl.
+        // Pass in a fake context, so we can just use opengl from glfw.
         try {
             GLContext.useContext(new Object());
         } catch (LWJGLException e) {
@@ -288,7 +299,7 @@ public class NawtMinecraft extends Minecraft {
         }
 
         wm.pollEvents();
-        Nawt.LOGGER.info("Created OpenGL 3.3 context!");
+        Nawt.log("Created OpenGL 3.3 context!");
     }
 
     /**
