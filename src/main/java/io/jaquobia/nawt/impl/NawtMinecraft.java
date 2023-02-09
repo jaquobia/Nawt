@@ -15,6 +15,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,6 +55,7 @@ public class NawtMinecraft extends Minecraft {
     /// Current Scroll Event
     private int currentScrollDelta = 0;
 
+    //TODO: Figure out what to do with sessionID, host, and port
     public NawtMinecraft(int width, int height, boolean fullscreen, String username, String host, String port) {
         super(null, null, null, width, height, fullscreen); // This also fixes the quit button
         mcThread = new Thread(this, "Minecraft main thread");
@@ -61,7 +63,6 @@ public class NawtMinecraft extends Minecraft {
         this.session = new Session(username, "");
         this.mcApplet = null;
         this.isApplet = false;
-
         keyboardEvents = new ArrayList<>();
         mouseEvents = new ArrayList<>();
     }

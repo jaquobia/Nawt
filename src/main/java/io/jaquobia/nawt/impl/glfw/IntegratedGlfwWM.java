@@ -16,7 +16,15 @@ import static io.jaquobia.nawt.impl.glfw.LwjglToGlfwHelper.translateKeyToLWJGL;
 @Environment(EnvType.CLIENT)
 public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
 
-    static boolean glfwInit = Glfw.glfwInit(); // A nice way to initialize glfw and report it at the same time
+    static boolean glfwInit;
+
+    static {
+        String javaLibPathPropertyName = "java.library.path";
+        String libPath = System.getProperty(javaLibPathPropertyName);
+        Glfw.LoadFrankinGlfwDylib(libPath);
+
+        glfwInit = Glfw.glfwInit(); // A nice way to initialize glfw and report it at the same time
+    }
 
     public long window;
     public int old_x, old_y, old_width, old_height; // used for fullscreen
