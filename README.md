@@ -11,14 +11,10 @@ Fullscreen while using sway: Seems to forget resize events when the window is in
 This issue was only tested on sway, but this could occur on i3, any other tiling window manager, or possibly on any WM in general.
 
 ## Warning
-This mod has not been tested on a variety of platforms, so it's a use-at-your-own-risk kind of thingp; however, it is very unlikely anything will happen as long as you're using a unix-like or Windows operating system.    
+This mod has not been tested on a variety of platforms, so it's a use-at-your-own-risk kind of thing; however, it is very unlikely anything will happen as long as you're using a unix-like or Windows operating system.    
 
-Feel free to make issues or pull requests if anything feels wrong is is broken
+Feel free to make issues or pull requests if anything feels wrong or is broken
 
 ## Future
 
 I could possibly make some bindings for glfw on the path or sdl2
-
-## License
-
-MIT
