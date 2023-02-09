@@ -8,7 +8,12 @@ import io.jaquobia.nawt.api.WindowManager;
 import io.jaquobia.nawt.impl.NawtMinecraft;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
 import org.lwjgl.input.Keyboard;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 
 import static io.jaquobia.nawt.impl.glfw.LwjglToGlfwHelper.translateKeyToGlfw;
 import static io.jaquobia.nawt.impl.glfw.LwjglToGlfwHelper.translateKeyToLWJGL;
@@ -21,6 +26,17 @@ public class IntegratedGlfwWM implements WindowManager, GlfwCallback {
     static {
         String javaLibPathPropertyName = "java.library.path";
         String libPath = System.getProperty(javaLibPathPropertyName);
+
+        if (libPath.endsWith("natives")) {
+            Nawt.log("This is a multimc instance!, redirecting to a custom bin folder");
+            String gameDir = FabricLoader.getInstance().getGameDir().toString().concat("/bin");
+            File binDir = new File(gameDir);
+            if (!binDir.exists()) {
+                Nawt.log("Created bin folder: " + binDir.mkdir());
+            }
+            libPath = gameDir;
+        }
+        Nawt.log(libPath);
         Glfw.LoadFrankinGlfwDylib(libPath);
 
         glfwInit = Glfw.glfwInit(); // A nice way to initialize glfw and report it at the same time
